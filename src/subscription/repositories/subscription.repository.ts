@@ -1,27 +1,27 @@
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { Plan } from '../schemas/plans.schema';
 import { RpcException } from '@nestjs/microservices';
-import { PlanEntity } from '../entities/plan.entity';
-import { UpdatePlanDto } from '../dto/update-plan.dto';
-import { CreatePlanDto } from '../dto/create-plan.dto';
 import { HttpStatus, Injectable } from '@nestjs/common';
+import { Subscription } from '../schemas/subscription.schema';
 import { PaginationDto } from 'src/commons/dto/pagination.dto';
+import { SubscriptionEntity } from '../entities/subscription.entity';
+import { CreateSubscriptionDto } from '../dto/create-subscription.dto';
+import { UpdateSubscriptionDto } from '../dto/update-subscription.dto';
 import { IRepository } from 'src/commons/interfaces/repository.interface';
 import { PaginatorInterface } from 'src/commons/interfaces/paginator.interface';
 
 @Injectable()
-export class PlansRepository implements IRepository {
-  constructor(@InjectModel(Plan.name) private readonly model: Model<Plan>) {}
+export class SubscriptionRepository implements IRepository {
+  constructor(@InjectModel(Subscription.name) private readonly model: Model<Subscription>) {}
 
   /**
    * Create one plan
-   * @param { CreatePlanDto } createPlanDto
-   * @returns { Promise<PlanEntity | unknown> }
+   * @param { CreateSubscriptionDto } createSubscriptionDto
+   * @returns { Promise<SubscriptionEntity | unknown> }
    */
-  async create(createPlanDto: CreatePlanDto): Promise<PlanEntity> {
+  async create(createSubscriptionDto: CreateSubscriptionDto): Promise<SubscriptionEntity> {
     try {
-      return (await this.model.create(createPlanDto)) as any;
+      return (await this.model.create(createSubscriptionDto)) as any;
     } catch (error) {
       throw new RpcException({
         message: error.message,
@@ -35,9 +35,9 @@ export class PlansRepository implements IRepository {
    * @param params
    */
   async find(params: {
-    key: keyof PlanEntity;
+    key: keyof SubscriptionEntity;
     value: any;
-  }): Promise<PlanEntity | null> {
+  }): Promise<SubscriptionEntity | null> {
     try {
       return await this.model.findOne({ [params.key]: params.value });
     } catch (error) {
@@ -79,9 +79,9 @@ export class PlansRepository implements IRepository {
   /**
    * Delete one plan
    * @param { string } id
-   * @return { PlanEntity | null }
+   * @return { SubscriptionEntity | null }
    */
-  async deleteOne(id: string): Promise<PlanEntity | null> {
+  async deleteOne(id: string): Promise<SubscriptionEntity | null> {
     try {
       return await this.model.findByIdAndDelete(id);
     } catch (error) {
@@ -95,12 +95,12 @@ export class PlansRepository implements IRepository {
   /**
    * Update one plan
    * @param { string } id
-   * @param { UpdatePlanDto } updatePlanDto
-   * @return { PlanEntity | null }
+   * @param { UpdateSubscriptionDto } updateSubscriptionDto
+   * @return { SubscriptionEntity | null }
    */
-  async updateOne(id: string, updatePlanDto: UpdatePlanDto): Promise<PlanEntity | null> {
+  async updateOne(id: string, updateSubscriptionDto: UpdateSubscriptionDto): Promise<SubscriptionEntity | null> {
     try {
-      return await this.model.findByIdAndUpdate(id, updatePlanDto, { new: true });
+      return await this.model.findByIdAndUpdate(id, updateSubscriptionDto, { new: true });
     } catch (error) {
       throw new RpcException({
         message: error.message,
