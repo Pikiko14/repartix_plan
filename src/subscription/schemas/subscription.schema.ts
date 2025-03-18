@@ -1,9 +1,10 @@
 import { Types } from 'mongoose';
 import { HydratedDocument } from 'mongoose';
+import { PeriodEnum } from '../dto/create-subscription.dto';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { SubscriptionEntity } from '../entities/subscription.entity';
-import { UsabilitiesEntity, UsabilitiesSchema } from '../../plans/schemas/usabilities.schema';
 import { UserSubscription, UserSubscriptionSchema } from './user-subscription.schema';
+import { UsabilitiesEntity, UsabilitiesSchema } from '../../plans/schemas/usabilities.schema';
 
 export type SubscriptionDocument = HydratedDocument<SubscriptionEntity>;
 
@@ -16,10 +17,13 @@ export class Subscription {
   date_start: Date;
 
   @Prop({ required: true })
-  date_end: number;
+  date_end: Date;
+
+  @Prop({ default: false })
+  is_active: boolean;
 
   @Prop()
-  is_active: string;
+  period: PeriodEnum;
 
   @Prop({ type: [UsabilitiesSchema], default: [] })
   usabilities: Types.Array<UsabilitiesEntity>;
