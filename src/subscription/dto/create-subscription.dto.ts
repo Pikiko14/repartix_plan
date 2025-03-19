@@ -42,4 +42,7 @@ export class CreateSubscriptionDto {
   @ValidateNested({ each: true })
   @Type(() => UsabilitiesDto)
   usabilities: UsabilitiesDto[];
+
+  @IsOptional()
+  paymentMethods?: string;
 }

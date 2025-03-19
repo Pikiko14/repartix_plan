@@ -2,6 +2,7 @@ import { PeriodEnum } from "../dto/create-subscription.dto";
 import { UsabilitiesEntity } from "src/plans/entities/plan.entity";
 
 export class SubscriptionEntity {
+  _id?: string;
   plan_id: string;
   user: UserSubscription;
   date_start: Date;
