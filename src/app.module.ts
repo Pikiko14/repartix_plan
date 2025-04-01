@@ -3,14 +3,12 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PlansModule } from './plans/plans.module';
 import { SubscriptionModule } from './subscription/subscription.module';
-import { PaymentsModule } from './payments/payments.module';
 
 @Module({
   imports: [
     PlansModule,
     MongooseModule.forRoot(envs.app_env === 'production' ?  envs.atlas_url : envs.db_url,),
     SubscriptionModule,
-    PaymentsModule,
   ],
   controllers: [],
   providers: [],
