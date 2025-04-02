@@ -1,6 +1,8 @@
-import { RpcException } from '@nestjs/microservices';
+import { firstValueFrom } from 'rxjs';
+import { envs } from 'src/configuration';
 import { DateUtility } from 'src/commons/utils/date.utility';
 import { HttpStatus, Inject, Injectable } from '@nestjs/common';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { PlansRepository } from 'src/plans/repositories/plans.repository';
 import { SubscriptionRepository } from './repositories/subscription.repository';
@@ -10,6 +12,7 @@ export class SubscriptionService {
   constructor(
     @Inject() private readonly dateUtility: DateUtility,
     @Inject() private readonly planRepository: PlansRepository,
+    @Inject(envs.nats_service_name) private readonly client: ClientProxy,
     @Inject() private readonly subscriptionRepository: SubscriptionRepository,
   ) {}
 
@@ -46,31 +49,22 @@ export class SubscriptionService {
       );
 
       // generate payment instance
-      //const paymentDto: CreatePaymentDto = {
-      //  date_pay: createSubscriptionDto.date_start,
-      //  external_id: null,
-      //  total: unit === 'month' ? plan.price : plan.price_year,
-      //  subscription_id: subscription._id,
-      //  user: {
-      //    _id: subscription?.user?._id || '',
-      //    email: subscription?.user?.email || '',
-      //    phone: subscription?.user?.phone || '',
-      //    fullname: subscription?.user?.fullname || '',
-      //    username: subscription?.user?.username || '',
-      //  },
-      //  paymentMethods:
-      //    createSubscriptionDto.paymentMethods === 'mercadopago'
-      //      ? PaymentMethods.mercadopago
-      //      : null,
-      //};
-      //const paymentInstance = await this.paymentServices.create(paymentDto);
+      const paymentDto = {
+        date_pay: createSubscriptionDto.date_start,
+        external_id: null,
+        total: unit === 'month' ? plan.price : plan.price_year,
+        subscription_id: subscription._id,
+        paymentMethods: 'mercadopago',
+      };
+      const paymentInstance = await firstValueFrom(this.client.send('create_payment_subscription', paymentDto));
+      console.log(paymentInstance);
 
       // return plan
       return {
         success: true,
         data: {
           subscription,
-          //paymentInstance,
+          paymentInstance,
         },
         message: 'Subscription created success',
       };

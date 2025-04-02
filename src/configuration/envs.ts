@@ -8,6 +8,7 @@ interface EnvVars {
   APP_URL: string;
   ATLAS_URL: string;
   NATS_URL: string;
+  NATH_SERVICE: string;
 }
 
 const envsSchema = joi.object({
@@ -17,6 +18,7 @@ const envsSchema = joi.object({
   APP_ENV: joi.string().required(),
   APP_URL: joi.string().required(),
   NATS_URL: joi.string().required(),
+  NATH_SERVICE: joi.string().required(),
 })
 .unknown(true);
 
@@ -39,4 +41,5 @@ export const envs = {
   atlas_url: envVars.ATLAS_URL,
   app_url: envVars.APP_URL,
   nats_server: envVars.NATS_URL,
+  nats_service_name: envVars.NATH_SERVICE,
 }
