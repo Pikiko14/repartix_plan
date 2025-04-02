@@ -108,4 +108,20 @@ export class SubscriptionRepository implements IRepository {
       });
     }
   }
+
+  /**
+   * Get last subscription
+   * @param { string } userId
+   * return 
+   */
+  async getLastSubscription(_id: string): Promise<SubscriptionEntity | null> {
+    try {
+      return await this.model.findById(_id);
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        status: HttpStatus.BAD_REQUEST,
+      });
+    }
+  }
 }

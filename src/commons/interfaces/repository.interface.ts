@@ -19,6 +19,8 @@ export interface IRepository {
 
   findAll(paginationDto: PaginationDto): Promise<PaginatorInterface>;
 
+  findByQuery?(query: any): Promise<SubscriptionEntity | unknown>;
+
   deleteOne(id: string): Promise<PlanEntity | SubscriptionEntity | null>;
 
   updateOne(

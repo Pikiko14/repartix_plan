@@ -11,4 +11,9 @@ export class SubscriptionController {
   create(@Payload() createSubscriptionDto: CreateSubscriptionDto) {
     return this.subscriptionService.create(createSubscriptionDto);
   }
+
+  @MessagePattern('get_user_subscription')
+  getSubscriptionByUser(@Payload() id: string) {
+    return this.subscriptionService.getSubscriptionByUser(id);
+  }
 }

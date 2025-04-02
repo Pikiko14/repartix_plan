@@ -81,4 +81,16 @@ export class SubscriptionService {
       });
     }
   }
+
+  async getSubscriptionByUser(id: string) {
+    try {
+      const subscription = await this.subscriptionRepository.getLastSubscription(id);
+      return subscription;
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        status: HttpStatus.BAD_REQUEST
+      })
+    }
+  }
 }
