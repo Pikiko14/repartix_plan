@@ -114,9 +114,11 @@ export class SubscriptionRepository implements IRepository {
    * @param { string } userId
    * return 
    */
-  async getLastSubscription(_id: string): Promise<SubscriptionEntity | null> {
+  async getLastSubscription(_id: string): Promise<SubscriptionEntity | unknown> {
     try {
-      return await this.model.findById(_id);
+      return await this.model.findOne({ 'user._id': _id })
+      .sort({ date_start: -1 })
+      .exec();
     } catch (error) {
       throw new RpcException({
         message: error.message,
