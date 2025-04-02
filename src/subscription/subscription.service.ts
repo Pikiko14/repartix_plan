@@ -33,7 +33,7 @@ export class SubscriptionService {
       let unit = createSubscriptionDto.period;
       createSubscriptionDto.date_end = this.dateUtility.addDate(
         createSubscriptionDto.date_start,
-        unit === 'month' ? 30 : 365,
+        unit === 'month' ? 30 : 1,
         unit === 'month' ? 'days' : 'years',
       );
 
