@@ -57,7 +57,6 @@ export class SubscriptionService {
         paymentMethods: 'mercadopago',
       };
       const paymentInstance = await firstValueFrom(this.client.send('create_payment_subscription', paymentDto));
-      console.log(paymentInstance);
 
       // return plan
       return {
