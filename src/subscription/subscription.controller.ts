@@ -1,6 +1,7 @@
 import { Controller } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import { PaymentDto } from './dto/payment-subscription.dto';
 import { SubscriptionService } from './subscription.service';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 
 @Controller()
@@ -15,5 +16,10 @@ export class SubscriptionController {
   @MessagePattern('get_user_subscription')
   getSubscriptionByUser(@Payload() id: string) {
     return this.subscriptionService.getSubscriptionByUser(id);
+  }
+
+  @MessagePattern('payment_success')
+  paymentSuccess(@Payload() paymentDto: PaymentDto) {
+    return this.subscriptionService.validateSubscruptionOnPayment(paymentDto);
   }
 }

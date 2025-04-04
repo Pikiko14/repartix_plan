@@ -98,7 +98,7 @@ export class SubscriptionRepository implements IRepository {
    * @param { UpdateSubscriptionDto } updateSubscriptionDto
    * @return { SubscriptionEntity | null }
    */
-  async updateOne(id: string, updateSubscriptionDto: UpdateSubscriptionDto): Promise<SubscriptionEntity | null> {
+  async updateOne(id: string, updateSubscriptionDto: SubscriptionEntity): Promise<SubscriptionEntity | null> {
     try {
       return await this.model.findByIdAndUpdate(id, updateSubscriptionDto, { new: true });
     } catch (error) {

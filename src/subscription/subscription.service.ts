@@ -1,14 +1,17 @@
 import { firstValueFrom } from 'rxjs';
 import { envs } from 'src/configuration';
+import { PaymentDto } from './dto/payment-subscription.dto';
 import { DateUtility } from 'src/commons/utils/date.utility';
-import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
+import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
 import { PlansRepository } from 'src/plans/repositories/plans.repository';
 import { SubscriptionRepository } from './repositories/subscription.repository';
 
 @Injectable()
 export class SubscriptionService {
+  logger = new Logger();
+
   constructor(
     @Inject() private readonly dateUtility: DateUtility,
     @Inject() private readonly planRepository: PlansRepository,
@@ -75,15 +78,47 @@ export class SubscriptionService {
     }
   }
 
-  async getSubscriptionByUser(id: string) {
+  async getSubscriptionByUser(userId: string) {
     try {
-      const subscription = await this.subscriptionRepository.getLastSubscription(id);
+      const subscription = await this.subscriptionRepository.getLastSubscription(userId);
       return subscription;
     } catch (error) {
       throw new RpcException({
         message: error.message,
         status: HttpStatus.BAD_REQUEST
-      })
+      });
+    }
+  }
+
+  async validateSubscruptionOnPayment(paymentDto: PaymentDto) {
+    const subscription = await this.subscriptionRepository.find({ key: '_id', value: paymentDto.subscription_id });
+    if (!subscription) {
+      this.logger.error(`No existe una suscription con este id ${paymentDto.subscription_id}`);
+      return false;
+    }
+    
+    if (paymentDto.payment_status === 'payment_status') {
+      this.logger.error(`No puedo validar la suscripción ya que el estado del pago no es aprobado`);
+      return false;
+    }
+
+    try {
+      subscription.is_active = true;
+      await this.subscriptionRepository.updateOne(paymentDto.subscription_id, subscription);      
+
+      // send notification
+      this.client.emit('createNotitication', {
+        data: {
+          ...subscription,
+          ...paymentDto
+        },
+        channel: 'email',
+        type_notification: 'success_payment_notification',
+        destinatary: subscription?.user?.email,
+      });
+      return subscription;
+    } catch (error) {
+      this.logger.error(`Error: ${JSON.stringify(error)}`);
     }
   }
 }

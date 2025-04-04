@@ -25,6 +25,6 @@ export interface IRepository {
 
   updateOne(
     id: string,
-    updatePlanDto: UpdatePlanDto | UpdateSubscriptionDto,
+    updatePlanDto: UpdatePlanDto | SubscriptionEntity,
   ): Promise<PlanEntity | SubscriptionEntity>;
 }
