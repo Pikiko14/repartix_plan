@@ -109,7 +109,7 @@ export class SubscriptionService {
       // send notification
       this.client.emit('createNotitication', {
         data: {
-          ...subscription,
+          ...JSON.parse(JSON.stringify(subscription)),
           ...paymentDto
         },
         channel: 'email',
