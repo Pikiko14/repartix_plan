@@ -114,7 +114,7 @@ export class SubscriptionRepository implements IRepository {
    * @param { string } userId
    * return 
    */
-  async getLastSubscription(_id: string): Promise<SubscriptionEntity | unknown> {
+  async getLastSubscription(_id: string): Promise<SubscriptionEntity | any> {
     try {
       return await this.model.findOne({ 'user._id': _id })
       .sort({ date_start: -1 })

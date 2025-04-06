@@ -22,4 +22,9 @@ export class SubscriptionController {
   paymentSuccess(@Payload() paymentDto: PaymentDto) {
     return this.subscriptionService.validateSubscruptionOnPayment(paymentDto);
   }
+
+  @MessagePattern('validate_user_subscription')
+  validateUserSubscription(@Payload() id: string) {
+    return this.subscriptionService.validateUserSubscription(id);
+  }
 }

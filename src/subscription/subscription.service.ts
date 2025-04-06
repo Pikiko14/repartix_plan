@@ -121,4 +121,32 @@ export class SubscriptionService {
       this.logger.error(`Error: ${JSON.stringify(error)}`);
     }
   }
+
+  async validateUserSubscription(userId: string) {
+    try {
+      const subscription = await this.subscriptionRepository.getLastSubscription(userId);
+
+      // validamos si existe una subscripción
+      if (!subscription)
+        return { error: true, code: 404, message: `Not found one subscription for this userId: ${userId}` };
+
+      // validamos si la subscripción esta activa
+      if (subscription && !subscription.is_active)
+        return { error: true, code: 403, message: 'Subscription is not active.' };
+
+      // validamos la fecha de expiracion de la subscripción
+      const date = this.dateUtility.getDate();
+      const isInvalidValid = this.dateUtility.isDateAfter(date, subscription.date_end);
+      console.log(isInvalidValid);
+      if (isInvalidValid)
+        return { error: true, code: 403, message: 'Subscription expired' };
+
+      return subscription;
+    } catch (error) {
+      throw new RpcException({
+        message: error.message,
+        status: HttpStatus.BAD_REQUEST
+      });
+    }
+  }
 }
