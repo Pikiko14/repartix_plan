@@ -2,13 +2,15 @@ import { RpcException } from '@nestjs/microservices';
 import { CreatePlanDto } from './dto/create-plan.dto';
 import { UpdatePlanDto } from './dto/update-plan.dto';
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { PlansRepository } from './repositories/plans.repository';
 import { PaginationDto } from 'src/commons/dto/pagination.dto';
+import { CacheService } from 'src/commons/cache/cache.service';
+import { PlansRepository } from './repositories/plans.repository';
 
 @Injectable()
 export class PlansService {
   constructor(
     private readonly repository: PlansRepository,
+    private readonly cacheService: CacheService
   ){}
 
   async create(createPlanDto: CreatePlanDto) {
@@ -24,6 +26,9 @@ export class PlansService {
       // create plan
       const plan = await this.repository.create(createPlanDto);
 
+      //clear cache
+      await this.cacheService.removeItem('plans');
+
       // return plan
       return plan;
     } catch (error) {
@@ -36,8 +41,16 @@ export class PlansService {
 
   async findAll(paginationDto: PaginationDto) {
     try {
+      // get from cache
+      const plansCache = await this.cacheService.getItem('plans');
+      if (plansCache)
+        return plansCache;
+
       // create plan
       const plans = await this.repository.findAll(paginationDto);
+
+      // set plans in cache
+      await this.cacheService.setItem('plans', plans);
 
       // return plan
       return plans;
@@ -61,6 +74,9 @@ export class PlansService {
       // create plan
       const plan = await this.repository.updateOne(id, updatePlanDto);
 
+      //clear cache
+      await this.cacheService.removeItem('plans');
+
       // return plan
       return plan;
     } catch (error) {
@@ -82,6 +98,9 @@ export class PlansService {
     try {
       // create plan
       const plan = await this.repository.deleteOne(id);
+
+      //clear cache
+      await this.cacheService.removeItem('plans');
 
       // return plan
       return plan;
