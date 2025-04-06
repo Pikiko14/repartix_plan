@@ -1,7 +1,7 @@
 import { RpcException } from '@nestjs/microservices';
 import { CreatePlanDto } from './dto/create-plan.dto';
 import { UpdatePlanDto } from './dto/update-plan.dto';
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { PaginationDto } from 'src/commons/dto/pagination.dto';
 import { CacheService } from 'src/commons/cache/cache.service';
 import { PlansRepository } from './repositories/plans.repository';
@@ -9,8 +9,8 @@ import { PlansRepository } from './repositories/plans.repository';
 @Injectable()
 export class PlansService {
   constructor(
-    private readonly repository: PlansRepository,
-    private readonly cacheService: CacheService
+    @Inject() private readonly cacheService: CacheService,
+    @Inject() private readonly repository: PlansRepository,
   ){}
 
   async create(createPlanDto: CreatePlanDto) {

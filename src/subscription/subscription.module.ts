@@ -7,6 +7,7 @@ import { SubscriptionService } from './subscription.service';
 import { SubscriptionController } from './subscription.controller';
 import { Subscription, SubscriptionSchema } from './schemas/subscription.schema';
 import { SubscriptionRepository } from './repositories/subscription.repository';
+import { CacheServiceModule } from 'src/commons/cache/cache.module';
 
 @Module({
   imports: [
@@ -17,7 +18,8 @@ import { SubscriptionRepository } from './repositories/subscription.repository';
       }
     ]),
     PlansModule,
-    NatsModule
+    NatsModule,
+    CacheServiceModule,
   ],
   controllers: [SubscriptionController],
   providers: [SubscriptionService, SubscriptionRepository, DateUtility],

@@ -2,6 +2,7 @@ import { firstValueFrom } from 'rxjs';
 import { envs } from 'src/configuration';
 import { PaymentDto } from './dto/payment-subscription.dto';
 import { DateUtility } from 'src/commons/utils/date.utility';
+import { CacheService } from 'src/commons/cache/cache.service';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 import { HttpStatus, Inject, Injectable, Logger } from '@nestjs/common';
@@ -14,6 +15,7 @@ export class SubscriptionService {
 
   constructor(
     @Inject() private readonly dateUtility: DateUtility,
+    @Inject() private readonly cacheService: CacheService,
     @Inject() private readonly planRepository: PlansRepository,
     @Inject(envs.nats_service_name) private readonly client: ClientProxy,
     @Inject() private readonly subscriptionRepository: SubscriptionRepository,
@@ -80,7 +82,20 @@ export class SubscriptionService {
 
   async getSubscriptionByUser(userId: string) {
     try {
+      // get from cache
+      const cacheKey= `subscription:${userId}`;
+      const subscriptionCache = await this.cacheService.getItem(cacheKey);
+      if (subscriptionCache)
+        return subscriptionCache;
+
+      // get subscription from bbdd
       const subscription = await this.subscriptionRepository.getLastSubscription(userId);
+
+      // set subscription in cache
+      if (subscription)
+        await this.cacheService.setItem(cacheKey, subscription);
+
+      // return data
       return subscription;
     } catch (error) {
       throw new RpcException({
@@ -124,7 +139,7 @@ export class SubscriptionService {
 
   async validateUserSubscription(userId: string) {
     try {
-      const subscription = await this.subscriptionRepository.getLastSubscription(userId);
+      const subscription = await this.getSubscriptionByUser(userId);
 
       // validamos si existe una subscripción
       if (!subscription)
@@ -137,7 +152,7 @@ export class SubscriptionService {
       // validamos la fecha de expiracion de la subscripción
       const date = this.dateUtility.getDate();
       const isInvalidValid = this.dateUtility.isDateAfter(date, subscription.date_end);
-      console.log(isInvalidValid);
+
       if (isInvalidValid)
         return { error: true, code: 403, message: 'Subscription expired' };
 
