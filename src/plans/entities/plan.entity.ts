@@ -18,5 +18,6 @@ export class UsabilitiesEntity {
 export enum Models {
   users = 'USERS',
   orders = 'ORDERS',
-  whatsapp = 'whatsaap',
+  cities = 'CITIES',
+  clients = 'CLIENTS'
 }
